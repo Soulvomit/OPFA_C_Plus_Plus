@@ -49,7 +49,8 @@ namespace opfa_common_managed
         #region Heuristic
         internal override uint CalculateHeuristic(Pathfinder<CubicNode, ulong> cubicPathfinder)
         {
-            //3d manhattan
+            //3d manhattan 
+            //TODO: fix baseCost consistency
             return (uint)(10 * (Math.Abs(xyz[0] - (cubicPathfinder as CubicPathfinder).targetX) + 
                                 Math.Abs(xyz[1] - (cubicPathfinder as CubicPathfinder).targetY) + 
                                 Math.Abs(xyz[2] - (cubicPathfinder as CubicPathfinder).targetZ)));

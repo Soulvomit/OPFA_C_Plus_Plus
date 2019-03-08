@@ -16,8 +16,8 @@ namespace opfa_common_managed
             ushort cubeSize = 1000, uint outBufferSize = 10000, ushort startX = 0, ushort startY = 0, ushort startZ = 0,
             ushort targetX = 999, ushort targetY = 999, ushort targetZ = 999)
         {
-            //init cube data (MAX SIZE: 1280x1280x1280)
-            CubicLayout gl = new CubicLayout(cubeSize, cubeSize, cubeSize);
+            //init and setup cube layout (MAX SIZE: 1280x1280x1280)
+            CubicLayout gl = new CubicLayout(cubeSize, cubeSize, cubeSize, baseCost: 127);
             //profile cube creation
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -54,7 +54,14 @@ namespace opfa_common_managed
             profile.MapCreationTime = sw.ElapsedMilliseconds;
             profile.PathRunTime = sw1.ElapsedMilliseconds;
             profile.PathLength = gm.PathLength;
-            return gm.Path;
+            if (gm.PathLength > 0)
+            {
+                return gm.Path;
+            }
+            else
+            {
+                return null;
+            }
             //show time and length
             /*Console.WriteLine("TIME:   " + sw.ElapsedMilliseconds + "MS");
             Console.WriteLine("LENGTH: " + gm.PathLength);
@@ -76,8 +83,9 @@ namespace opfa_common_managed
             ushort gridSize = 30000, uint outBufferSize = 300000, ushort startX = 0, ushort startY = 0, 
             ushort targetX = 29999, ushort targetY = 29999)
         {
-            //init grid data (MAX SIZE: 46340x46340)
-            GridLayout gl = new GridLayout(gridSize, gridSize);
+            //init and setup grid layout (MAX SIZE: 46340x46340)
+            GridLayout gl = new GridLayout(gridSize, gridSize, includeDiagonals: true, useDiagonalModifier: true, 
+                                           diagonalModifier: 1.4f, baseCost: 64);
             //profile grid creation
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -90,6 +98,7 @@ namespace opfa_common_managed
                 gl.GenerateEmptyLayout();
             }
             sw.Stop();
+            //setup grid memory
             GridMemory gm = new GridMemory(outBufferSize, gl);
             gm.StartPosition = new ushort[2] { startX, startY };
             gm.TargetPosition = new ushort[2] { targetX, targetY };
@@ -113,12 +122,14 @@ namespace opfa_common_managed
             profile.MapCreationTime = sw.ElapsedMilliseconds;
             profile.PathRunTime = sw1.ElapsedMilliseconds;
             profile.PathLength = gm.PathLength;
-            return gm.Path;
-            //show time and length
-            /*Console.WriteLine("MAPTIME:    " + sw.ElapsedMilliseconds + "MS");
-            Console.WriteLine("PATHTIME:   " + sw1.ElapsedMilliseconds + "MS");
-            Console.WriteLine("LENGTH:     " + gm.PathLength);
-            Console.ReadKey();*/
+            if (gm.PathLength > 0)
+            {
+                return gm.Path;
+            }
+            else
+            {
+                return null;
+            }
         }
         #endregion
 

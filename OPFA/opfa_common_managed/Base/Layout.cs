@@ -7,7 +7,7 @@
         //properties
         public byte BaseCost { get { return baseCost; } }
         //constructor
-        protected Layout( byte baseCost = 10)
+        protected Layout(byte baseCost = 127)
         {
             this.baseCost = baseCost;
         }

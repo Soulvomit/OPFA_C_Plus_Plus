@@ -28,7 +28,7 @@ namespace opfa_common_managed
         #endregion
 
         #region Constructor
-        public GridLayout(ushort width, ushort height, bool includeDiagonals = true, bool useDiagonalModifier = true, float diagonalModifier = 1.4f, byte baseCost = 10) : base(baseCost)
+        public GridLayout(ushort width, ushort height, bool includeDiagonals = true, bool useDiagonalModifier = true, float diagonalModifier = 1.4f, byte baseCost = 127) : base(baseCost)
         {
             inbufferSize = (uint)(width * height);
             inbuffer = new byte[width, height];

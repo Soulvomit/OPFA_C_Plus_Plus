@@ -24,7 +24,7 @@ namespace opfa_common_managed
         #endregion
 
         #region Constructor
-        public CubicLayout(ushort width, ushort height, ushort depth, byte baseCost = 10) : base(baseCost)
+        public CubicLayout(ushort width, ushort height, ushort depth, byte baseCost = 127) : base(baseCost)
         {
             inbufferSize = (ulong)(width * height * depth);
             inbuffer = new byte[width, height, depth];
