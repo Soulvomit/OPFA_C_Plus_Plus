@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "opfa_tests_unit", "opfa_tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "opfa_tests_console", "opfa_tests_console\opfa_tests_console.csproj", "{9104D704-C03E-4F37-8CA2-CEED6AE27B09}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opfa_common_native", "opfa_common_native\opfa_common_native.vcxproj", "{9BCD69F2-5B40-4E34-ACCF-7CF8EA36F43E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,16 @@ Global
 		{9104D704-C03E-4F37-8CA2-CEED6AE27B09}.Release|x64.Build.0 = Release|Any CPU
 		{9104D704-C03E-4F37-8CA2-CEED6AE27B09}.Release|x86.ActiveCfg = Release|Any CPU
 		{9104D704-C03E-4F37-8CA2-CEED6AE27B09}.Release|x86.Build.0 = Release|Any CPU
+		{9BCD69F2-5B40-4E34-ACCF-7CF8EA36F43E}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{9BCD69F2-5B40-4E34-ACCF-7CF8EA36F43E}.Debug|x64.ActiveCfg = Debug|x64
+		{9BCD69F2-5B40-4E34-ACCF-7CF8EA36F43E}.Debug|x64.Build.0 = Debug|x64
+		{9BCD69F2-5B40-4E34-ACCF-7CF8EA36F43E}.Debug|x86.ActiveCfg = Debug|Win32
+		{9BCD69F2-5B40-4E34-ACCF-7CF8EA36F43E}.Debug|x86.Build.0 = Debug|Win32
+		{9BCD69F2-5B40-4E34-ACCF-7CF8EA36F43E}.Release|Any CPU.ActiveCfg = Release|Win32
+		{9BCD69F2-5B40-4E34-ACCF-7CF8EA36F43E}.Release|x64.ActiveCfg = Release|x64
+		{9BCD69F2-5B40-4E34-ACCF-7CF8EA36F43E}.Release|x64.Build.0 = Release|x64
+		{9BCD69F2-5B40-4E34-ACCF-7CF8EA36F43E}.Release|x86.ActiveCfg = Release|Win32
+		{9BCD69F2-5B40-4E34-ACCF-7CF8EA36F43E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

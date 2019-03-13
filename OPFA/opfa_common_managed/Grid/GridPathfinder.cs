@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace opfa_common_managed
 {
@@ -15,6 +17,7 @@ namespace opfa_common_managed
         //properties
         public GridMemory GridMemory { get { return (memory as GridMemory); } }
         public GridLayout GridLayout { get { return (memory.Layout as GridLayout); } }
+        int id = Guid.NewGuid().GetHashCode();
 
         #region Constructor
         internal GridPathfinder(GridMemory gridMemory) : base(gridMemory)
@@ -26,38 +29,52 @@ namespace opfa_common_managed
             openQueue = new PriorityQueue<GridNode>((int)memory.OutBufferSize, new OpenComparer<GridNode, uint>());
             #endif
             closedSet = new HashSet<uint>();
+
+            Init(id, GridLayout.BaseCost, GridLayout.Width, GridLayout.Height, (byte)GridLayout.GridPathType,
+            GridLayout.DiagonalModifier, GridLayout.Inbuffer, GridMemory.OutBufferSize, GridMemory.outbuffer, GridMemory.startX, 
+            GridMemory.startY, GridMemory.targetX, GridMemory.targetY);
+        }
+        ~GridPathfinder()
+        {
+            //Free(id);
         }
         #endregion
 
         #region Produce Frame
         internal override void ProduceFrame()
         {
-            if (GridLayout.UseDiagonalModifier)
+            if (GridMemory.enviromentType == EnviromentType.Managed)
             {
-                //diagonals included
-                offsetCount = 8;
-                ProduceFrameDiagonalWeighted();
-            }
-            else
-            {
-                //set which adjecent offsets to include in path
-                if (GridLayout.IncludeDiagonals)
+                if (GridLayout.GridPathType == GridPathType.Normal)
                 {
                     //diagonals included
                     offsetCount = 8;
+                    ProduceFrameNormal();
                 }
-                else
+                else if (GridLayout.GridPathType == GridPathType.NoDiagonals)
                 {
                     //diagonals excluded
                     offsetCount = 4;
+                    ProduceFrameNormal();
                 }
-                ProduceFrameFast();
+                else if (GridLayout.GridPathType == GridPathType.WeightedDiagonals)
+                {
+                    //diagonals included
+                    offsetCount = 8;
+                    ProduceFrameDiagonalWeighted();
+                }
+            }
+            else if (GridMemory.enviromentType == EnviromentType.Native)
+            {
+                Reinit(id, (byte)GridLayout.GridPathType, GridLayout.DiagonalModifier, GridMemory.OutBufferSize, 
+                    GridMemory.startX, GridMemory.startY, GridMemory.targetX, GridMemory.targetY);
+                GridMemory.pathLength = ProduceFrame(id);
             }
         }
         #endregion
 
-        #region Produce Frame: Fast
-        private void ProduceFrameFast()
+        #region Produce Frame: Normal
+        private void ProduceFrameNormal()
         {
             producingFrame = true;
             ReadyNextFrame();
@@ -99,7 +116,7 @@ namespace opfa_common_managed
                         continue;
                     }
                     //get adjecent resistance from resistance map
-                    byte adjecentResistance = GridLayout.inbuffer[adjecentX, adjecentY];
+                    byte adjecentResistance = GridLayout.Inbuffer[adjecentY, adjecentX];
                     //check traversability
                     if (adjecentResistance == 0)
                     {
@@ -191,18 +208,18 @@ namespace opfa_common_managed
                         continue;
                     }
                     //get adjecent resistance from resistance map
-                    byte adjecentResistance = GridLayout.inbuffer[adjecentX, adjecentY];
-                    //check if the adjecent node is diagonal
-                    if(i > 3)
-                    {
-                        //add diagonal modifier for path smoothing
-                        adjecentResistance = (byte)(adjecentResistance * GridLayout.DiagonalModifier);
-                    }
+                    byte adjecentResistance = GridLayout.Inbuffer[adjecentY, adjecentX];
                     //check traversability
                     if (adjecentResistance == 0)
                     {
                         //adjecent resistance non-traversable, continue
                         continue;
+                    }
+                    //check if the adjecent node is diagonal
+                    if (i > 3)
+                    {
+                        //add diagonal modifier for path smoothing
+                        adjecentResistance = (byte)(adjecentResistance * GridLayout.DiagonalModifier);
                     }
                     GridNode adjecent;
                     //if adjecent x,y doesn't exist
@@ -310,6 +327,66 @@ namespace opfa_common_managed
             }
             return;
         }
+        #endregion
+
+        #region Native Function Entrypoints    
+        [DllImport("opfa_common_native.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void Init(
+        [param: MarshalAs(UnmanagedType.I4)]
+            int index,
+        [param: MarshalAs(UnmanagedType.U1)]
+            byte baseCost,
+        [param: MarshalAs(UnmanagedType.U2)]
+            ushort width,
+        [param: MarshalAs(UnmanagedType.U2)]
+            ushort height,
+        [param: MarshalAs(UnmanagedType.U1)]
+            byte gridPathType,
+        [param: MarshalAs(UnmanagedType.R4)]
+            float diagonalModifier,
+        [param: MarshalAs(UnmanagedType.LPArray)]
+            byte[,] inbuffer,
+        [param: MarshalAs(UnmanagedType.U4)]
+            uint outbuffer_size,
+        [param: MarshalAs(UnmanagedType.LPArray)]
+            uint[] outbuffer,
+        [param: MarshalAs(UnmanagedType.U2)]
+            ushort startX,
+        [param: MarshalAs(UnmanagedType.U2)]
+            ushort startY,
+        [param: MarshalAs(UnmanagedType.U2)]
+            ushort targetX,
+        [param: MarshalAs(UnmanagedType.U2)]
+            ushort targetY);
+
+        [DllImport("opfa_common_native.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void Reinit(
+            [param: MarshalAs(UnmanagedType.I4)]
+                        int index,
+            [param: MarshalAs(UnmanagedType.U1)]
+                        byte gridPathType,
+            [param: MarshalAs(UnmanagedType.R4)]
+                        float diagonalModifier,
+            [param: MarshalAs(UnmanagedType.U4)]
+                        uint outbuffer_size,
+            [param: MarshalAs(UnmanagedType.U2)]
+                        ushort startX,
+            [param: MarshalAs(UnmanagedType.U2)]
+                        ushort startY,
+            [param: MarshalAs(UnmanagedType.U2)]
+                        ushort targetX,
+            [param: MarshalAs(UnmanagedType.U2)]
+                        ushort targetY);
+
+        [DllImport("opfa_common_native.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I4)]
+        private static extern int ProduceFrame([param: MarshalAs(UnmanagedType.I4)] int index);
+
+        [DllImport("opfa_common_native.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void Free([param: MarshalAs(UnmanagedType.I4)] int index);
+
+        [DllImport("opfa_common_native.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void FreeBatch();
         #endregion
     }
 }

@@ -12,22 +12,20 @@ namespace opfa_common_managed
         private ushort width;
         private ushort height;
         private ushort depth;
-        private ulong inbufferSize;
         //public members
-        public volatile byte[,,] inbuffer;
+        public volatile byte[,,] Inbuffer;
 
         #region Properties
         public ushort Width { get { return width; } }
         public ushort Height { get { return height; } }
         public ushort Depth { get { return depth; } }
-        public ulong InBufferSize { get { return inbufferSize; } }
+        public ulong InBufferSize { get { return (ulong)(width * height * depth); } }
         #endregion
 
         #region Constructor
         public CubicLayout(ushort width, ushort height, ushort depth, byte baseCost = 127) : base(baseCost)
         {
-            inbufferSize = (ulong)(width * height * depth);
-            inbuffer = new byte[width, height, depth];
+            Inbuffer = new byte[width, height, depth];
             this.width = width;
             this.height = height;
             this.depth = depth;
@@ -37,7 +35,8 @@ namespace opfa_common_managed
         #region Generate Layout
         public override void GenerateEmptyLayout()
         {
-            #if v35
+            Inbuffer = new byte[width, height, depth];
+#if v35
             //.NET 3.5
             for (int z = 0; z < depth; z++)
             {
@@ -50,7 +49,7 @@ namespace opfa_common_managed
                     }
                 }
             }
-            #else
+#else
             //above .NET 3.5
             Parallel.For(0, depth, z =>
             {
@@ -58,15 +57,16 @@ namespace opfa_common_managed
                 {
                     for (int x = 0; x < width; x++)
                     {
-                        inbuffer[x, y, z] = 0; 
+                        Inbuffer[x, y, z] = 0; 
                     }
                 });
             });
-            #endif
+#endif
         }
         public override void GenerateBlockRandomLayout(byte blockFrequency)
         {
-            #if v35
+            Inbuffer = new byte[width, height, depth];
+#if v35
             //.NET 3.5
             //initialize random seed
             Random rand = new Random();
@@ -87,29 +87,26 @@ namespace opfa_common_managed
                     }
                 }
             }
-            #else
+#else
             //above .NET 3.5
             Parallel.For(0, depth, (z, loopState) =>
             {
-                //Parallel.For(0, height, y =>
-                //{
                 for (int y = 0; y < height; y++)
                 {
                     for (int x = 0; x < width; x++)
                     {
                         if (StaticRandom.Rand(0, blockFrequency) == 0)
                         {
-                            inbuffer[x, y, z] = 0;
+                            Inbuffer[x, y, z] = 0;
                         }
                         else
                         {
-                            inbuffer[x, y, z] = baseCost;
+                            Inbuffer[x, y, z] = baseCost;
                         }
                     }
                 }
-                //});
             });
-            #endif
+#endif
         }
         public override void GenerateRandomLayout(byte blockFrequency, byte resistanceCap)
         {
@@ -146,11 +143,11 @@ namespace opfa_common_managed
                     {
                         if (StaticRandom.Rand(0, blockFrequency) == 0)
                         {
-                            inbuffer[x, y, z] = 0;
+                            Inbuffer[x, y, z] = 0;
                         }
                         else
                         {
-                            inbuffer[x, y, z] = (byte)StaticRandom.Rand(1, resistanceCap);
+                            Inbuffer[x, y, z] = (byte)StaticRandom.Rand(1, resistanceCap);
                         }
                     }
                 }
@@ -163,11 +160,11 @@ namespace opfa_common_managed
         #region Get/Set Resistances
         public byte GetResistance(ushort x, ushort y, ushort z)
         {
-            return inbuffer[x, y, z];
+            return Inbuffer[x, y, z];
         }
         public void SetResistance(ushort x, ushort y, ushort z, byte value)
         {
-            inbuffer[x, y, z] = value;
+            Inbuffer[x, y, z] = value;
         }
         #endregion
     }

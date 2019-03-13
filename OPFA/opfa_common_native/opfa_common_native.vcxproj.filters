@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Base">
+      <UniqueIdentifier>{b0a2cd50-a527-4353-8c7e-749686b9df4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Grid">
+      <UniqueIdentifier>{fced361d-d67d-4b70-a4da-6b6cf441d87b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cubic">
+      <UniqueIdentifier>{70ac632b-0fde-4e5d-bdc6-3b16ec8d60ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Link">
+      <UniqueIdentifier>{a2f9451a-befb-4cfe-901b-7fa8cc150cee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Base">
+      <UniqueIdentifier>{8a71f202-fd75-4e8b-8da1-129f2c66592f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Grid">
+      <UniqueIdentifier>{d454a83e-0f6a-454b-b58f-56921004f6a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cubic">
+      <UniqueIdentifier>{de386125-c4bf-44cb-bf43-3e22dad2e46c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Link">
+      <UniqueIdentifier>{61f6e8f0-8304-44e8-9758-08a5dcb6ac11}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GridNode.h">
+      <Filter>Header Files\Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="GridPathfinder.h">
+      <Filter>Header Files\Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="Bytefuser.h">
+      <Filter>Header Files\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GridNode.cpp">
+      <Filter>Source Files\Grid</Filter>
+    </ClCompile>
+    <ClCompile Include="GridPathfinder.cpp">
+      <Filter>Source Files\Grid</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

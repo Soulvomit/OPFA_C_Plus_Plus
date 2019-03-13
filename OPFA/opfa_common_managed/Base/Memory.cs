@@ -16,6 +16,7 @@ namespace opfa_common_managed
         internal volatile bool targetChanged = false;
         internal volatile int pathLength = 0;
         internal Pathfinder<T, V> pathfinder = null;
+        internal EnviromentType enviromentType = EnviromentType.Managed;
 
         #region Properties
         public uint OutBufferSize { get { return outbufferSize; } }
@@ -27,6 +28,7 @@ namespace opfa_common_managed
         public Thread Worker { get { return worker; } }
         public int PathLength { get { return pathLength; } }
         public abstract uint[,] Path {  get; }
+        public EnviromentType EnviromentType { get { return enviromentType; } set { enviromentType = value; } }
         #endregion
 
         #region Constructor
