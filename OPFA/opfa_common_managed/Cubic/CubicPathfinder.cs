@@ -108,7 +108,7 @@ namespace opfa_common_managed
                         continue;
                     }
                     //get adjecent resistance from resistance map
-                    byte adjecentResistance = CubicLayout.inbuffer[adjecentX, adjecentY, adjecentZ];
+                    byte adjecentResistance = CubicLayout.Inbuffer[adjecentX, adjecentY, adjecentZ];
                     //check traversability
                     if (adjecentResistance == 0)
                     {

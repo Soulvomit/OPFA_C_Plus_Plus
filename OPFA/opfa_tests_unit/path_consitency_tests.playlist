@@ -1,0 +1,17 @@
+<Playlist Version="1.0">
+  <Add Test="opfa_common_test.PathConsistencyTest.StaticConsistencyTest" />
+  <Add Test="opfa_common_test.PathConsistencyTest.Map2x2_ConsistencyTest" />
+  <Add Test="opfa_common_test.PathConsistencyTest.Map4x4_ConsistencyTest" />
+  <Add Test="opfa_common_test.PathConsistencyTest.Map8x8_ConsistencyTest" />
+  <Add Test="opfa_common_test.PathConsistencyTest.Map16x16_ConsistencyTest" />
+  <Add Test="opfa_common_test.PathConsistencyTest.Map32x32_ConsistencyTest" />
+  <Add Test="opfa_common_test.PathConsistencyTest.Map64x64_ConsistencyTest" />
+  <Add Test="opfa_common_test.PathConsistencyTest.Map128x128_ConsistencyTest" />
+  <Add Test="opfa_common_test.PathConsistencyTest.Map256x256_ConsistencyTest" />
+  <Add Test="opfa_common_test.PathConsistencyTest.Map512x512_ConsistencyTest" />
+  <Add Test="opfa_common_test.PathConsistencyTest.Map1024x1024_ConsistencyTest" />
+  <Add Test="opfa_common_test.PathConsistencyTest.Map2048x2048_ConsistencyTest" />
+  <Add Test="opfa_common_test.PathConsistencyTest.Map4096x4096_ConsistencyTest" />
+  <Add Test="opfa_common_test.PathConsistencyTest.Map8192x8192_ConsistencyTest" />
+  <Add Test="opfa_common_test.PathConsistencyTest.Map16384x16384_ConsistencyTest" />
+</Playlist>

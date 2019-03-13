@@ -8,9 +8,73 @@ namespace opfa_common_managed
         public long MapCreationTime;
         public long PathRunTime;
         public int PathLength;
+        public uint[,] Path; 
     }
     public static class Profiler
     {
+        #region ProfileGrid
+        public static void ProfileGrid(out Profile profile, bool onThread, bool random, byte blockFrequency, byte resistanceCap,
+            ushort gridSize = 30000, uint outBufferSize = 300000, ushort startX = 0, ushort startY = 0,
+            ushort targetX = 29999, ushort targetY = 29999, GridPathType pathType = GridPathType.Normal, byte[,] layout = null,
+            EnviromentType enviromentType = EnviromentType.Managed)
+        {
+            //init and setup grid layout (MAX SIZE: 46340x46340)
+            GridLayout gl = new GridLayout(gridSize, gridSize, pathType, 1.4f, 64);
+            //profile grid creation
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            if (layout == null)
+            {
+                if (random)
+                {
+                    gl.GenerateRandomLayout(blockFrequency, resistanceCap);
+                }
+                else
+                {
+                    gl.GenerateEmptyLayout();
+                }
+            }
+            else
+            {
+                gl.Inbuffer = layout;
+            }
+            sw.Stop();
+            //setup grid memory
+            GridMemory gm = new GridMemory(outBufferSize, gl);
+            gm.EnviromentType = enviromentType;
+            gm.StartPosition = new ushort[2] { startX, startY };
+            gm.TargetPosition = new ushort[2] { targetX, targetY };
+            gl.Inbuffer[gm.StartPosition[0], gm.StartPosition[1]] = 1;
+            gl.Inbuffer[gm.TargetPosition[0], gm.TargetPosition[1]] = 1;
+            //profile grid path
+            Stopwatch sw1 = new Stopwatch();
+            sw1.Start();
+            if (onThread)
+            {
+                gm.RunThreadedOnce();
+                gm.JoinThreadedOnce();
+            }
+            else
+            {
+                gm.RunOnce();
+            }
+            sw1.Stop();
+            //save info to profile
+            profile = new Profile();
+            profile.MapCreationTime = sw.ElapsedMilliseconds;
+            profile.PathRunTime = sw1.ElapsedMilliseconds;
+            profile.PathLength = gm.PathLength;
+            if (gm.PathLength > 0)
+            {
+                profile.Path = gm.Path;
+            }
+            else
+            {
+                profile.Path = null;
+            }
+        }
+        #endregion
+
         #region ProfileCubic
         public static uint[,] ProfileCubic(out Profile profile, bool onThread, bool random, byte blockFrequency, byte resistanceCap, 
             ushort cubeSize = 1000, uint outBufferSize = 10000, ushort startX = 0, ushort startY = 0, ushort startZ = 0,
@@ -34,8 +98,8 @@ namespace opfa_common_managed
             CubicMemory gm = new CubicMemory(outBufferSize, gl);
             gm.StartPosition = new ushort[3] { startX, startY, startZ };
             gm.TargetPosition = new ushort[3] { targetX, targetY, targetZ };
-            gl.inbuffer[gm.StartPosition[0], gm.StartPosition[1], gm.StartPosition[2]] = 1;
-            gl.inbuffer[gm.TargetPosition[0], gm.TargetPosition[1], gm.TargetPosition[2]] = 1;
+            gl.Inbuffer[gm.StartPosition[0], gm.StartPosition[1], gm.StartPosition[2]] = 1;
+            gl.Inbuffer[gm.TargetPosition[0], gm.TargetPosition[1], gm.TargetPosition[2]] = 1;
             //profile cube path
             Stopwatch sw1 = new Stopwatch();
             sw1.Start();
@@ -78,66 +142,11 @@ namespace opfa_common_managed
         }
         #endregion
 
-        #region ProfileGrid
-        public static uint[,] ProfileGrid(out Profile profile, bool onThread, bool random, byte blockFrequency, byte resistanceCap, 
-            ushort gridSize = 30000, uint outBufferSize = 300000, ushort startX = 0, ushort startY = 0, 
-            ushort targetX = 29999, ushort targetY = 29999)
-        {
-            //init and setup grid layout (MAX SIZE: 46340x46340)
-            GridLayout gl = new GridLayout(gridSize, gridSize, includeDiagonals: true, useDiagonalModifier: true, 
-                                           diagonalModifier: 1.4f, baseCost: 64);
-            //profile grid creation
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            if (random)
-            {
-                gl.GenerateRandomLayout(blockFrequency, resistanceCap);
-            }
-            else
-            {
-                gl.GenerateEmptyLayout();
-            }
-            sw.Stop();
-            //setup grid memory
-            GridMemory gm = new GridMemory(outBufferSize, gl);
-            gm.StartPosition = new ushort[2] { startX, startY };
-            gm.TargetPosition = new ushort[2] { targetX, targetY };
-            gl.inbuffer[gm.StartPosition[0], gm.StartPosition[1]] = 1;
-            gl.inbuffer[gm.TargetPosition[0], gm.TargetPosition[1]] = 1;
-            //profile grid path
-            Stopwatch sw1 = new Stopwatch();
-            sw1.Start();
-            if (onThread)
-            {
-                gm.RunThreadedOnce();
-                gm.JoinThreadedOnce();
-            }
-            else
-            {
-                gm.RunOnce();
-            }
-            sw1.Stop();
-            //save info to profile
-            profile = new Profile();
-            profile.MapCreationTime = sw.ElapsedMilliseconds;
-            profile.PathRunTime = sw1.ElapsedMilliseconds;
-            profile.PathLength = gm.PathLength;
-            if (gm.PathLength > 0)
-            {
-                return gm.Path;
-            }
-            else
-            {
-                return null;
-            }
-        }
-        #endregion
-
         #region ProfileGridRun
         public static void ProfileGridRun(byte blockFrequency, byte resistanceCap, bool random = true)
         {
             //init grid and memory pathfinder
-            GridLayout gl = new GridLayout(40, 40);
+            GridLayout gl = new GridLayout(40, 40, GridPathType.Normal);
             if (random)
             {
                 gl.GenerateRandomLayout(blockFrequency, resistanceCap);
@@ -149,8 +158,8 @@ namespace opfa_common_managed
             GridMemory gm = new GridMemory(1600, gl);
             gm.StartPosition = new ushort[2] { 0, 0 };
             gm.TargetPosition = new ushort[2] { 39, 39 };
-            gl.inbuffer[gm.StartPosition[0], gm.StartPosition[1]] = 1;
-            gl.inbuffer[gm.TargetPosition[0], gm.TargetPosition[1]] = 1;
+            gl.Inbuffer[gm.StartPosition[0], gm.StartPosition[1]] = 1;
+            gl.Inbuffer[gm.TargetPosition[0], gm.TargetPosition[1]] = 1;
             //run memory pathfinder
             gm.Run();
             string cmd = null;
@@ -256,7 +265,7 @@ namespace opfa_common_managed
                 {
                     for (uint x = 0; x < gl.Width; x++)
                     {
-                        byte resistance = gl.inbuffer[x, y];
+                        byte resistance = gl.Inbuffer[x, y];
                         if (resistance < 10)
                         {
                             append = true;
@@ -311,7 +320,7 @@ namespace opfa_common_managed
                 {
                     for (uint x = 0; x < gl.Width; x++)
                     {
-                        byte resistance = gl.inbuffer[x, y];
+                        byte resistance = gl.Inbuffer[x, y];
                         if (resistance < 10)
                         {
                             append = true;
@@ -352,7 +361,5 @@ namespace opfa_common_managed
             Console.WriteLine();
         }
         #endregion
-
-
     }
 }

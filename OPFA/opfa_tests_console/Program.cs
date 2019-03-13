@@ -7,7 +7,8 @@ namespace opfa_common_console
     {
         public static void Main(string[] args)
         {
-
+            PathSpeedTest.RunSimpleTest();
+            //PathSpeedTest.RunRandomTests(5);
             Console.Read();
         }
     }

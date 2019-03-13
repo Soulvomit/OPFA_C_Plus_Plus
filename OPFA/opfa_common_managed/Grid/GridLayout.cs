@@ -11,31 +11,25 @@ namespace opfa_common_managed
         //private members
         private ushort width;
         private ushort height;
-        private bool includeDiagonals;
-        private bool useDiagonalModifier;
+        private GridPathType pathType;
         private float diagonalModifier;
-        private uint inbufferSize;
         //public members
-        public volatile byte[,] inbuffer;
+        public volatile byte[,] Inbuffer = null;
 
         #region Properties
         public ushort Width { get { return width; } }
         public ushort Height { get { return height; } }
-        public bool IncludeDiagonals { get { return includeDiagonals; } }
-        public bool UseDiagonalModifier { get { return useDiagonalModifier; } }
+        public GridPathType GridPathType { get { return pathType; } set { pathType = value; } }
         public float DiagonalModifier { get { return diagonalModifier; } }
-        public uint InBufferSize { get { return inbufferSize; } }
+        public uint InBufferSize { get { return (uint)(width * height); } }
         #endregion
 
         #region Constructor
-        public GridLayout(ushort width, ushort height, bool includeDiagonals = true, bool useDiagonalModifier = true, float diagonalModifier = 1.4f, byte baseCost = 127) : base(baseCost)
+        public GridLayout(ushort width, ushort height, GridPathType pathType, float diagonalModifier = 1.4f, byte baseCost = 127) : base(baseCost)
         {
-            inbufferSize = (uint)(width * height);
-            inbuffer = new byte[width, height];
             this.width = width;
             this.height = height;
-            this.includeDiagonals = includeDiagonals;
-            this.useDiagonalModifier = useDiagonalModifier;
+            this.pathType = pathType;
             this.diagonalModifier = diagonalModifier;
         }
         #endregion
@@ -43,7 +37,8 @@ namespace opfa_common_managed
         #region Generate Layout
         public override void GenerateEmptyLayout()
         {
-            #if v35
+            Inbuffer = new byte[width, height];
+#if v35
             for (int y = 0; y < height; ++y)
             {
                 for (int x = 0; x < width; x++)
@@ -51,21 +46,22 @@ namespace opfa_common_managed
                     inbuffer[x, y] = baseCost;
                 }
             }
-            #else
+#else
             //above .NET 3.5
             Parallel.For(0, height, y =>
             {
                 for (int x = 0; x < width; x++)
                 {
-                    inbuffer[x, y] = baseCost;
+                    Inbuffer[x, y] = baseCost;
                 }
             });
-            #endif
+#endif
         }
         public override void GenerateBlockRandomLayout(byte blockFrequency)
         {
+            Inbuffer = new byte[width, height];
             //initialize random seed
-            #if v35
+#if v35
             Random rand = new Random();
             for (int y = 0; y < height; ++y)
             {
@@ -81,27 +77,28 @@ namespace opfa_common_managed
                     }
                 }
             }
-            #else
+#else
             Parallel.For(0, height, y =>
             {
                 for (int x = 0; x < width; x++)
                 {
                     if (StaticRandom.Rand(0, blockFrequency) == 0)
                     {
-                        inbuffer[x, y] = 0;
+                        Inbuffer[x, y] = 0;
                     }
                     else
                     {
-                        inbuffer[x, y] = baseCost;
+                        Inbuffer[x, y] = baseCost;
                     }
                 }
             });
-            #endif
+#endif
         }
         public override void GenerateRandomLayout(byte blockFrequency, byte resistanceCap)
         {
+            Inbuffer = new byte[width, height];
             //initialize random seed
-            #if v35
+#if v35
             Random rand = new Random();
             for (int y = 0; y < height; ++y)
             {
@@ -117,33 +114,33 @@ namespace opfa_common_managed
                     }
                 }
             }
-            #else
+#else
             Parallel.For(0, height, y =>
             {
                 for (int x = 0; x < width; x++)
                 {
                     if (StaticRandom.Rand(0, blockFrequency) == 0)
                     {
-                        inbuffer[x, y] = 0;
+                        Inbuffer[x, y] = 0;
                     }
                     else
                     {
-                        inbuffer[x, y] = (byte)StaticRandom.Rand(1, resistanceCap);
+                        Inbuffer[x, y] = (byte)StaticRandom.Rand(1, resistanceCap);
                     }
                 }
             });
-            #endif
+#endif
         }
         #endregion
 
         #region Get/Set Resistance
         public byte GetResistance(ushort x, ushort y)
         {
-            return inbuffer[x, y];
+            return Inbuffer[x, y];
         }
         public void SetResistance(ushort x, ushort y, byte value)
         {
-            inbuffer[x, y] = value;
+            Inbuffer[x, y] = value;
         }
         #endregion
     }
