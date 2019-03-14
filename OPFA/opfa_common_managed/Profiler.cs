@@ -3,18 +3,11 @@ using System.Diagnostics;
 
 namespace opfa_common_managed
 {
-    public struct Profile
-    {
-        public long MapCreationTime;
-        public long PathRunTime;
-        public int PathLength;
-        public uint[,] Path; 
-    }
     public static class Profiler
     {
         #region ProfileGrid
-        public static void ProfileGrid(out Profile profile, bool onThread, bool random, byte blockFrequency, byte resistanceCap,
-            ushort gridSize = 30000, uint outBufferSize = 300000, ushort startX = 0, ushort startY = 0,
+        public static void ProfileGrid(out Profile profile, bool onThread, bool random, byte blockFrequency = 5, 
+            byte resistanceCap = 127, ushort gridSize = 30000, uint outBufferSize = 300000, ushort startX = 0, ushort startY = 0,
             ushort targetX = 29999, ushort targetY = 29999, GridPathType pathType = GridPathType.Normal, byte[,] layout = null,
             EnviromentType enviromentType = EnviromentType.Managed)
         {
@@ -63,6 +56,7 @@ namespace opfa_common_managed
             profile = new Profile();
             profile.MapCreationTime = sw.ElapsedMilliseconds;
             profile.PathRunTime = sw1.ElapsedMilliseconds;
+            profile.PathRunTimeTicks = sw1.ElapsedTicks;
             profile.PathLength = gm.PathLength;
             if (gm.PathLength > 0)
             {
@@ -116,7 +110,7 @@ namespace opfa_common_managed
             //save info to profile
             profile = new Profile();
             profile.MapCreationTime = sw.ElapsedMilliseconds;
-            profile.PathRunTime = sw1.ElapsedMilliseconds;
+            profile.PathRunTimeTicks = sw1.ElapsedMilliseconds;
             profile.PathLength = gm.PathLength;
             if (gm.PathLength > 0)
             {

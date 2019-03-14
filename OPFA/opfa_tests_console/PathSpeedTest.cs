@@ -322,19 +322,19 @@ namespace opfa_common_console
             Console.WriteLine("PathLength :      " + pManaged.PathLength);
             if (pManaged.PathRunTime > failTimeMillis)
                 Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("PathRuntime :     " + pManaged.PathRunTime + "MS");
+            Console.WriteLine("PathRuntime :     " + pManaged.PathRunTimeTicks + " Ticks");
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Enviroment :      " + "Native");
             Console.WriteLine("PathLength :      " + pNative.PathLength);
             if (pNative.PathRunTime > failTimeMillis)
                 Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("PathRuntime :     " + pNative.PathRunTime + "MS");
+            Console.WriteLine("PathRuntime :     " + pNative.PathRunTimeTicks + " Ticks");
             Console.ForegroundColor = ConsoleColor.Magenta;
-            if (pManaged.PathRunTime > pNative.PathRunTime)
+            if (pManaged.PathRunTimeTicks > pNative.PathRunTimeTicks)
             {
                 Console.WriteLine("Winner :          Native");
             }
-            else if (pManaged.PathRunTime < pNative.PathRunTime)
+            else if (pManaged.PathRunTimeTicks < pNative.PathRunTimeTicks)
             {
                 Console.WriteLine("Winner :          Managed");
             }
@@ -380,19 +380,19 @@ namespace opfa_common_console
             Console.WriteLine("PathLength :      " + pManaged.PathLength);
             if (pManaged.PathRunTime > failTimeMillis)
                 Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("PathRuntime :     " + pManaged.PathRunTime + "MS");
+            Console.WriteLine("PathRuntime :     " + pManaged.PathRunTimeTicks + " Ticks");
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Enviroment :      " + "Native");
             Console.WriteLine("PathLength :      " + pNative.PathLength);
             if (pNative.PathRunTime > failTimeMillis)
                 Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("PathRuntime :     " + pNative.PathRunTime + "MS");
+            Console.WriteLine("PathRuntime :     " + pNative.PathRunTimeTicks + " Ticks");
             Console.ForegroundColor = ConsoleColor.Magenta;
-            if (pManaged.PathRunTime > pNative.PathRunTime)
+            if (pManaged.PathRunTimeTicks > pNative.PathRunTimeTicks)
             {
                 Console.WriteLine("Winner :          Native");
             }
-            else if (pManaged.PathRunTime < pNative.PathRunTime)
+            else if (pManaged.PathRunTimeTicks < pNative.PathRunTimeTicks)
             {
                 Console.WriteLine("Winner :          Managed");
             }
@@ -441,19 +441,19 @@ namespace opfa_common_console
             Console.WriteLine("PathLength :      " + pManaged.PathLength);
             if (pManaged.PathRunTime > failTimeMillis)
                 Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("PathRuntime :     " + pManaged.PathRunTime + "MS");
+            Console.WriteLine("PathRuntime :     " + pManaged.PathRunTimeTicks + " Ticks");
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Enviroment :      " + "Native");
             Console.WriteLine("PathLength :      " + pNative.PathLength);
             if (pNative.PathRunTime > failTimeMillis)
                 Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("PathRuntime :     " + pNative.PathRunTime + "MS");
+            Console.WriteLine("PathRuntime :     " + pNative.PathRunTimeTicks + " Ticks");
             Console.ForegroundColor = ConsoleColor.Magenta;
-            if (pManaged.PathRunTime > pNative.PathRunTime)
+            if (pManaged.PathRunTimeTicks > pNative.PathRunTimeTicks)
             {
                 Console.WriteLine("Winner :          Native");
             }
-            else if (pManaged.PathRunTime < pNative.PathRunTime)
+            else if (pManaged.PathRunTimeTicks < pNative.PathRunTimeTicks)
             {
                 Console.WriteLine("Winner :          Managed");
             }
@@ -499,19 +499,19 @@ namespace opfa_common_console
             Console.WriteLine("PathLength :      " + pManaged.PathLength);
             if (pManaged.PathRunTime > failTimeMillis)
                 Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("PathRuntime :     " + pManaged.PathRunTime + "MS");
+            Console.WriteLine("PathRuntime :     " + pManaged.PathRunTimeTicks + " Ticks");
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Enviroment :      " + "Native");
             Console.WriteLine("PathLength :      " + pNative.PathLength);
             if (pNative.PathRunTime > failTimeMillis)
                 Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("PathRuntime :     " + pNative.PathRunTime + "MS");
+            Console.WriteLine("PathRuntime :     " + pNative.PathRunTimeTicks + " Ticks");
             Console.ForegroundColor = ConsoleColor.Magenta;
-            if (pManaged.PathRunTime > pNative.PathRunTime)
+            if (pManaged.PathRunTimeTicks > pNative.PathRunTimeTicks)
             {
                 Console.WriteLine("Winner :          Native");
             }
-            else if (pManaged.PathRunTime < pNative.PathRunTime)
+            else if (pManaged.PathRunTimeTicks < pNative.PathRunTimeTicks)
             {
                 Console.WriteLine("Winner :          Managed");
             }
