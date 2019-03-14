@@ -1,6 +1,7 @@
 #pragma once
 #include "Common.h"
 
+#pragma region Node Packet Struct
 #pragma pack(push, 1)
 struct node_packet
 {
@@ -11,7 +12,9 @@ struct node_packet
 	uint16_t xy[2];
 };
 #pragma pack(pop)
+#pragma endregion
 
+#pragma region Grid Node Class
 class GridNode
 {
 private:
@@ -46,3 +49,4 @@ public:
 	void calc_hueristic(uint16_t* target);
 	node_packet* get_data();
 };
+#pragma endregion

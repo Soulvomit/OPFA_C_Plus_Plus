@@ -80,7 +80,7 @@ int32_t GridPathfinder::produce_frame()
 #pragma region Ready Next Frame
 void GridPathfinder::ready_next_frame()
 {
-	std::map<uint32_t, GridNode>::iterator it;
+	std::unordered_map<uint32_t, GridNode>::iterator it;
 
 	if (m_target_changed)
 	{
@@ -131,8 +131,6 @@ void GridPathfinder::ready_next_frame()
 #pragma region Produce Frame: Normal
 int32_t GridPathfinder::produce_frame_normal()
 {
-	std::unordered_set<uint32_t>::iterator it_uset;
-	std::map<uint32_t, GridNode>::iterator it_map;
 	producing_frame = true;
 	ready_next_frame();
 	//while open queue is not empty
@@ -160,8 +158,7 @@ int32_t GridPathfinder::produce_frame_normal()
 			//fuse adjecent x,y
 			uint32_t adjecent_fxy = Fuse(adjecent_x, adjecent_y);
 			//if adjecent fxy is closed
-			it_uset = closed_set.find(adjecent_fxy);
-			if (it_uset != closed_set.end())
+			if (closed_set.count(adjecent_fxy) == 1)
 			{
 				//node closed, continue
 				continue;
@@ -182,8 +179,7 @@ int32_t GridPathfinder::produce_frame_normal()
 			}
 			GridNode* adjecent;
 			//if adjecent x,y doesn't exist
-			it_map = creation_map.find(adjecent_fxy);
-			if (it_map == creation_map.end())
+			if (creation_map.count(adjecent_fxy) == 0)
 			{
 				//create node and set it as adjecent node
 				creation_map.emplace(std::make_pair(adjecent_fxy, GridNode(adjecent_x, adjecent_y)));
@@ -227,8 +223,6 @@ int32_t GridPathfinder::produce_frame_normal()
 #pragma region Produce Frame: Diagonal Weighted
 int32_t GridPathfinder::produce_frame_diagonal_weighted() 
 {
-	std::unordered_set<uint32_t>::iterator it_uset;
-	std::map<uint32_t, GridNode>::iterator it_map;
 	producing_frame = true;
 	ready_next_frame();
 	//while open queue is not empty
@@ -256,8 +250,7 @@ int32_t GridPathfinder::produce_frame_diagonal_weighted()
 			//fuse adjecent x,y
 			uint32_t adjecent_fxy = Fuse(adjecent_x, adjecent_y);
 			//if adjecent fxy is closed
-			it_uset = closed_set.find(adjecent_fxy);
-			if (it_uset != closed_set.end())
+			if (closed_set.count(adjecent_fxy) == 1)
 			{
 				//node closed, continue
 				continue;
@@ -284,8 +277,7 @@ int32_t GridPathfinder::produce_frame_diagonal_weighted()
 			}
 			GridNode* adjecent;
 			//if adjecent x,y doesn't exist
-			it_map = creation_map.find(adjecent_fxy);
-			if (it_map == creation_map.end())
+			if (creation_map.count(adjecent_fxy) == 0)
 			{
 				//create node and set it as adjecent node
 				creation_map.emplace(std::make_pair(adjecent_fxy, GridNode(adjecent_x, adjecent_y)));

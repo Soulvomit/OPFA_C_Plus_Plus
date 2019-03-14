@@ -2,7 +2,7 @@
 #include "GridNode.h"
 #include "Bytefuser.h"
 
-#pragma region Open Node Comparer
+#pragma region Open Node Comparer Struct
 struct functor_fh
 {
 	bool operator()(const std::pair<uint32_t, node_packet*>& left_pair,
@@ -50,8 +50,8 @@ private:
 	int32_t offsets[8][2] = { { 0, 1 }, { 0, -1 }, { 1, 0 }, { -1, 0 }, { 1, 1 }, { 1, -1 }, { -1, 1 }, { -1, -1 } };
 	uint8_t m_offset_count;
 	//data structures - on stack
-	std::map<uint32_t, GridNode> creation_map;
-	std::priority_queue<std::pair<uint32_t, node_packet*>, std::vector<std::pair<uint32_t, node_packet*>>, functor_fh> open_queue;
+	std::unordered_map<uint32_t, GridNode> creation_map;
+	boost::heap::fibonacci_heap<std::pair<uint32_t, node_packet*>, boost::heap::compare<functor_fh>> open_queue;
 	std::unordered_set<uint32_t> closed_set;
 	//state indicators
 	std::atomic<bool> producing_frame = false;

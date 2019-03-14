@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "GridPathfinder.h"
 
-std::map<uint32_t, GridPathfinder*> pathfinder_batch;
+std::unordered_map<uint32_t, GridPathfinder*> pathfinder_batch;
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,

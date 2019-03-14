@@ -15,12 +15,12 @@ namespace opfa_common_test
         [TestMethod]
         public void StaticConsistencyTest()
         {
-            TestStaticConsistency();
-            TestStaticConsistency1();
-            TestStaticConsistency2();
-            TestStaticConsistency3();
-            TestStaticConsistency4();
-            TestStaticConsistency5();
+            TestStaticConsistencyNormal();
+            TestStaticConsistencyNormal1();
+            TestStaticConsistencyNoDiagonals();
+            TestStaticConsistencyNoDiagonals1();
+            TestStaticConsistencyWieghtedDiagonals();
+            TestStaticConsistencyWieghtedDiagonals1();
         }
         [TestMethod]
         public void Map2x2_ConsistencyTest()
@@ -114,15 +114,20 @@ namespace opfa_common_test
         /// <param name="mapSize">Size of the quardratic map to test on.</param>
         private void TestSimpleConsistency(ushort mapSize)
         {
-            Profile p;
-
-            //result run
-            Profiler.ProfileGrid(profile: out p, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
+            Profile pManaged;
+            Profile pNative;
+            //result run managed
+            Profiler.ProfileGrid(profile: out pManaged, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
                                                 gridSize: mapSize, outBufferSize: (uint)(mapSize * 2), startX: 0, startY: 0,
                                                 targetX: (ushort)(mapSize - 1), targetY: (ushort)(mapSize - 1));
-
+            //result run
+            Profiler.ProfileGrid(profile: out pNative, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
+                                                gridSize: mapSize, outBufferSize: (uint)(mapSize * 2), startX: 0, startY: 0,
+                                                targetX: (ushort)(mapSize - 1), targetY: (ushort)(mapSize - 1),
+                                                pathType: GridPathType.Normal, layout: null, enviromentType: EnviromentType.Native);
             //assert that pathfinding length is equal to expected length
-            Assert.AreEqual(mapSize - 1, p.PathLength);
+            Assert.AreEqual(mapSize - 1, pManaged.PathLength);
+            Assert.AreEqual(mapSize - 1, pNative.PathLength);
         }
         #endregion
 
@@ -135,27 +140,38 @@ namespace opfa_common_test
         /// <param name="blockFrequence">How often the algorithm will encounter a blocked node.</param>
         private void TestRandomConsistency(ushort mapSize, int timeOutFail, byte blockFrequence)
         {
-            Profile p;
+            Profile pManaged;
+            Profile pNative;
 
             //result run
-            Profiler.ProfileGrid(profile: out p, onThread: false, random: true, blockFrequency: blockFrequence, resistanceCap: 127,
+            Profiler.ProfileGrid(profile: out pManaged, onThread: false, random: true, blockFrequency: blockFrequence, resistanceCap: 127,
                                                 gridSize: mapSize, outBufferSize: (uint)(mapSize * 2), startX: 0, startY: 0,
                                                 targetX: (ushort)(mapSize - 1), targetY: (ushort)(mapSize - 1));
 
+            //result run
+            Profiler.ProfileGrid(profile: out pNative, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
+                                                gridSize: mapSize, outBufferSize: (uint)(mapSize * 2), startX: 0, startY: 0,
+                                                targetX: (ushort)(mapSize - 1), targetY: (ushort)(mapSize - 1),
+                                                pathType: GridPathType.Normal, layout: null, enviromentType: EnviromentType.Native);
+
             //assert that pathfinding did not take too long (longer then time out fail)
-            Assert.IsTrue(p.PathRunTime < timeOutFail);
+            Assert.IsTrue(pManaged.PathRunTime < timeOutFail);
+            Assert.IsTrue(pNative.PathRunTime < timeOutFail);
             //assert that pathfinding length is not 0 (-1 is a valid result, which means no path could be found)
-            Assert.IsTrue(p.PathLength != 0);
+            Assert.IsTrue(pManaged.PathLength != 0);
+            Assert.IsTrue(pNative.PathLength != 0);
         }
         #endregion
 
         #region Static Consistency Tests
         /// <summary>
-        /// Tests the algorithm on a static 8x8 map. Actual path must be excatly the same as expected path. 
+        /// Tests the algorithm on a static 8x8 map. Actual path must be excatly the same as expected path.
+        /// Normal Pathfinding: daigonal and straight nodes are valued the same.
         /// </summary>
-        private void TestStaticConsistency()
+        private void TestStaticConsistencyNormal()
         {
-            Profile p;
+            Profile pManaged;
+            Profile pNative;
             uint[,] expectedPath = {
                 { 0,1}, { 0,2}, { 0,3}, { 0,4}, { 0,5}, { 0,6}, { 1,7}, { 2,7}, { 3,6}, { 3,5},
                 { 3,4}, { 3,3}, { 3,2}, { 3,1}, { 4,0}, { 5,1}, { 6,1}, { 7,2}, { 7,3}, { 7,4},
@@ -173,21 +189,30 @@ namespace opfa_common_test
             };
         
             //result run
-            Profiler.ProfileGrid(profile: out p, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
+            Profiler.ProfileGrid(profile: out pManaged, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
                                                 gridSize: 8, outBufferSize: 30, startX: 0, startY: 0,
                                                 targetX: 7, targetY: 7, pathType: GridPathType.Normal, layout: m8x8);
+            //result run
+            Profiler.ProfileGrid(profile: out pNative, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
+                                                gridSize: 8, outBufferSize: 30, startX: 0, startY: 0, targetX: 7, targetY: 7, 
+                                                pathType: GridPathType.Normal, layout: m8x8, enviromentType: EnviromentType.Native);
 
             //assert that pathfinding did not take too long (longer then time out fail)
-            CollectionAssert.AreEqual(expectedPath, p.Path);
+            CollectionAssert.AreEqual(expectedPath, pManaged.Path);
+            CollectionAssert.AreEqual(expectedPath, pNative.Path);
             //assert that pathfinding length is 23
-            Assert.AreEqual(23, p.PathLength);
+            Assert.AreEqual(23, pManaged.PathLength);
+            Assert.AreEqual(23, pNative.PathLength);
         }
         /// <summary>
-        /// Tests the algorithm on a static 8x8 map. Actual path must be excatly the same as expected path. 
+        /// Tests the algorithm on a static 8x8 map. Actual path must be excatly the same as expected path.
+        /// Normal Pathfinding: daigonal and straight nodes are valued the same.
         /// </summary>
-        private void TestStaticConsistency1()
+        private void TestStaticConsistencyNormal1()
         {
-            Profile p;
+            Profile pManaged;
+            Profile pNative;
+
             uint[,] expectedPath = {
                 { 0,1}, { 1,2}, { 2,3}, { 3,4}, { 4,5}, { 5,5}, { 6,4}, { 7,5}, { 7,6}, { 7,7}
             };
@@ -203,21 +228,30 @@ namespace opfa_common_test
             };
 
             //result run
-            Profiler.ProfileGrid(profile: out p, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
+            Profiler.ProfileGrid(profile: out pManaged, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
                                                 gridSize: 8, outBufferSize: 30, startX: 0, startY: 0,
                                                 targetX: 7, targetY: 7, pathType: GridPathType.Normal, layout: m8x8);
 
+            //result run
+            Profiler.ProfileGrid(profile: out pNative, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
+                                                gridSize: 8, outBufferSize: 30, startX: 0, startY: 0, targetX: 7, targetY: 7,
+                                                pathType: GridPathType.Normal, layout: m8x8, enviromentType: EnviromentType.Native);
+
             //assert that pathfinding did not take too long (longer then time out fail)
-            CollectionAssert.AreEqual(expectedPath, p.Path);
-            //assert that pathfinding length is 10
-            Assert.AreEqual(10, p.PathLength);
+            CollectionAssert.AreEqual(expectedPath, pManaged.Path);
+            CollectionAssert.AreEqual(expectedPath, pNative.Path);
+            //assert that pathfinding length is 23
+            Assert.AreEqual(10, pManaged.PathLength);
+            Assert.AreEqual(10, pNative.PathLength);
         }
         /// <summary>
-        /// Tests the algorithm on a static 8x8 map. Actual path must be excatly the same as expected path. 
+        /// Tests the algorithm on a static 8x8 map. Actual path must be excatly the same as expected path.
+        /// No Diagonal Pathfinding: daigonal steps are excluded from the path.
         /// </summary>
-        private void TestStaticConsistency2()
+        private void TestStaticConsistencyNoDiagonals()
         {
-            Profile p;
+            Profile pManaged;
+            Profile pNative;
             uint[,] expectedPath = {
                 { 0,1}, { 0,2}, { 0,3}, { 0,4}, { 0,5}, { 0,6}, { 0,7}, { 1,7}, { 2,7}, { 3,7}, 
                 { 3,6}, { 3,5}, { 3,4}, { 3,3}, { 3,2}, { 3,1}, { 3,0}, { 4,0}, { 5,0}, { 5,1}, 
@@ -235,21 +269,31 @@ namespace opfa_common_test
             };
 
             //result run
-            Profiler.ProfileGrid(profile: out p, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
+            Profiler.ProfileGrid(profile: out pManaged, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
                                                 gridSize: 8, outBufferSize: 30, startX: 0, startY: 0,
                                                 targetX: 7, targetY: 7, pathType: GridPathType.NoDiagonals, layout: m8x8);
 
+            //result run
+            Profiler.ProfileGrid(profile: out pNative, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
+                                                gridSize: 8, outBufferSize: 30, startX: 0, startY: 0, targetX: 7, targetY: 7,
+                                                pathType: GridPathType.NoDiagonals, layout: m8x8, enviromentType: EnviromentType.Native);
+
             //assert that pathfinding did not take too long (longer then time out fail)
-            CollectionAssert.AreEqual(expectedPath, p.Path);
-            //assert that pathfinding length is 28
-            Assert.AreEqual(28, p.PathLength);
+            CollectionAssert.AreEqual(expectedPath, pManaged.Path);
+            CollectionAssert.AreEqual(expectedPath, pNative.Path);
+            //assert that pathfinding length is 23
+            Assert.AreEqual(28, pManaged.PathLength);
+            Assert.AreEqual(28, pNative.PathLength);
         }
         /// <summary>
-        /// Tests the algorithm on a static 8x8 map. Actual path must be excatly the same as expected path. 
+        /// Tests the algorithm on a static 8x8 map. Actual path must be excatly the same as expected path.
+        /// No Diagonal Pathfinding: daigonal steps are excluded from the path.
         /// </summary>
-        private void TestStaticConsistency3()
+        private void TestStaticConsistencyNoDiagonals1()
         {
-            Profile p;
+            Profile pManaged;
+            Profile pNative;
+
             uint[,] expectedPath = {
                 { 0,1}, { 0,2}, { 0,3}, { 0,4}, { 0,5}, { 0,6}, { 0,7}, { 1,7}, { 2,7}, { 3,7},
                 { 3,6}, { 3,5}, { 4,5}, { 5,5}, { 5,4}, { 6,4}, { 7,4}, { 7,5}, { 7,6}, { 7,7}
@@ -266,21 +310,30 @@ namespace opfa_common_test
             };
 
             //result run
-            Profiler.ProfileGrid(profile: out p, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
+            Profiler.ProfileGrid(profile: out pManaged, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
                                                 gridSize: 8, outBufferSize: 30, startX: 0, startY: 0,
                                                 targetX: 7, targetY: 7, pathType: GridPathType.NoDiagonals, layout: m8x8);
 
+            //result run
+            Profiler.ProfileGrid(profile: out pNative, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
+                                                gridSize: 8, outBufferSize: 30, startX: 0, startY: 0, targetX: 7, targetY: 7,
+                                                pathType: GridPathType.NoDiagonals, layout: m8x8, enviromentType: EnviromentType.Native);
+
             //assert that pathfinding did not take too long (longer then time out fail)
-            CollectionAssert.AreEqual(expectedPath, p.Path);
-            //assert that pathfinding length is 10
-            Assert.AreEqual(20, p.PathLength);
+            CollectionAssert.AreEqual(expectedPath, pManaged.Path);
+            CollectionAssert.AreEqual(expectedPath, pNative.Path);
+            //assert that pathfinding length is 23
+            Assert.AreEqual(20, pManaged.PathLength);
+            Assert.AreEqual(20, pNative.PathLength);
         }
         /// <summary>
         /// Tests the algorithm on a static 8x8 map. Actual path must be excatly the same as expected path. 
+        /// Diagonal Weighted Pathfinding: daigonal steps are more costly then straight nodes (factored by diagonal modifier: 1.4).
         /// </summary>
-        private void TestStaticConsistency4()
+        private void TestStaticConsistencyWieghtedDiagonals()
         {
-            Profile p;
+            Profile pManaged;
+            Profile pNative;
             uint[,] expectedPath = {
                 { 0,1}, { 0,2}, { 0,3}, { 0,4}, { 0,5}, { 0,6}, { 1,7}, { 2,7}, { 3,6}, { 3,5},
                 { 3,4}, { 3,3}, { 3,2}, { 3,1}, { 4,0}, { 5,1}, { 6,1}, { 7,2}, { 7,3}, { 7,4},
@@ -298,21 +351,30 @@ namespace opfa_common_test
             };
 
             //result run
-            Profiler.ProfileGrid(profile: out p, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
+            Profiler.ProfileGrid(profile: out pManaged, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
                                                 gridSize: 8, outBufferSize: 30, startX: 0, startY: 0,
                                                 targetX: 7, targetY: 7, pathType: GridPathType.WeightedDiagonals, layout: m8x8);
 
+            //result run
+            Profiler.ProfileGrid(profile: out pNative, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
+                                                gridSize: 8, outBufferSize: 30, startX: 0, startY: 0, targetX: 7, targetY: 7,
+                                                pathType: GridPathType.WeightedDiagonals, layout: m8x8, enviromentType: EnviromentType.Native);
+
             //assert that pathfinding did not take too long (longer then time out fail)
-            CollectionAssert.AreEqual(expectedPath, p.Path);
+            CollectionAssert.AreEqual(expectedPath, pManaged.Path);
+            CollectionAssert.AreEqual(expectedPath, pNative.Path);
             //assert that pathfinding length is 23
-            Assert.AreEqual(23, p.PathLength);
+            Assert.AreEqual(23, pManaged.PathLength);
+            Assert.AreEqual(23, pNative.PathLength);
         }
         /// <summary>
-        /// Tests the algorithm on a static 8x8 map. Actual path must be excatly the same as expected path. 
+        /// Tests the algorithm on a static 8x8 map. Actual path must be excatly the same as expected path.
+        /// Diagonal Weighted Pathfinding: daigonal steps are more costly then straight nodes (factored by diagonal modifier: 1.4).
         /// </summary>
-        private void TestStaticConsistency5()
+        private void TestStaticConsistencyWieghtedDiagonals1()
         {
-            Profile p;
+            Profile pManaged;
+            Profile pNative;
             uint[,] expectedPath = {
                 { 0,1}, { 1,2}, { 2,3}, { 3,4}, { 4,5}, { 5,5}, { 6,4}, { 7,5}, { 7,6}, { 7,7}
             };
@@ -328,14 +390,20 @@ namespace opfa_common_test
             };
 
             //result run
-            Profiler.ProfileGrid(profile: out p, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
+            Profiler.ProfileGrid(profile: out pManaged, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
                                                 gridSize: 8, outBufferSize: 30, startX: 0, startY: 0,
                                                 targetX: 7, targetY: 7, pathType: GridPathType.WeightedDiagonals, layout: m8x8);
+            //result run
+            Profiler.ProfileGrid(profile: out pNative, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
+                                                gridSize: 8, outBufferSize: 30, startX: 0, startY: 0, targetX: 7, targetY: 7,
+                                                pathType: GridPathType.WeightedDiagonals, layout: m8x8, enviromentType: EnviromentType.Native);
 
             //assert that pathfinding did not take too long (longer then time out fail)
-            CollectionAssert.AreEqual(expectedPath, p.Path);
-            //assert that pathfinding length is 10
-            Assert.AreEqual(10, p.PathLength);
+            CollectionAssert.AreEqual(expectedPath, pManaged.Path);
+            CollectionAssert.AreEqual(expectedPath, pNative.Path);
+            //assert that pathfinding length is 23
+            Assert.AreEqual(10, pManaged.PathLength);
+            Assert.AreEqual(10, pNative.PathLength);
         }
         #endregion
     }
