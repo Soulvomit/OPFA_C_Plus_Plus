@@ -14,10 +14,10 @@ namespace opfa_common_managed
         private uint fxyTarget;
         private uint fxyStart;
         private byte offsetCount;
+        private int id = Guid.NewGuid().GetHashCode();
         //properties
         public GridMemory GridMemory { get { return (memory as GridMemory); } }
         public GridLayout GridLayout { get { return (memory.Layout as GridLayout); } }
-        int id = Guid.NewGuid().GetHashCode();
 
         #region Constructor
         internal GridPathfinder(GridMemory gridMemory) : base(gridMemory)
@@ -30,8 +30,8 @@ namespace opfa_common_managed
             #endif
             closedSet = new HashSet<uint>();
 
-            Init(id, GridLayout.BaseCost, GridLayout.Width, GridLayout.Height, (byte)GridLayout.GridPathType,
-            GridLayout.DiagonalModifier, GridLayout.Inbuffer, GridMemory.OutBufferSize, GridMemory.outbuffer, GridMemory.startX, 
+            Init(id, GridLayout.BaseCost, GridLayout.Width, GridLayout.Height, (byte)GridMemory.GridPathType,
+            GridMemory.DiagonalModifier, GridLayout.Inbuffer, GridMemory.OutBufferSize, GridMemory.outbuffer, GridMemory.startX, 
             GridMemory.startY, GridMemory.targetX, GridMemory.targetY);
         }
         ~GridPathfinder()
@@ -45,19 +45,19 @@ namespace opfa_common_managed
         {
             if (GridMemory.enviromentType == EnviromentType.Managed)
             {
-                if (GridLayout.GridPathType == GridPathType.Normal)
+                if (GridMemory.GridPathType == GridPathType.Normal)
                 {
                     //diagonals included
                     offsetCount = 8;
                     ProduceFrameNormal();
                 }
-                else if (GridLayout.GridPathType == GridPathType.NoDiagonals)
+                else if (GridMemory.GridPathType == GridPathType.NoDiagonals)
                 {
                     //diagonals excluded
                     offsetCount = 4;
                     ProduceFrameNormal();
                 }
-                else if (GridLayout.GridPathType == GridPathType.WeightedDiagonals)
+                else if (GridMemory.GridPathType == GridPathType.WeightedDiagonals)
                 {
                     //diagonals included
                     offsetCount = 8;
@@ -66,7 +66,7 @@ namespace opfa_common_managed
             }
             else if (GridMemory.enviromentType == EnviromentType.Native)
             {
-                Reinit(id, (byte)GridLayout.GridPathType, GridLayout.DiagonalModifier, GridMemory.OutBufferSize, 
+                Reinit(id, (byte)GridMemory.GridPathType, GridMemory.DiagonalModifier, GridMemory.OutBufferSize, 
                     GridMemory.startX, GridMemory.startY, GridMemory.targetX, GridMemory.targetY);
                 GridMemory.pathLength = ProduceFrame(id);
             }
@@ -116,7 +116,7 @@ namespace opfa_common_managed
                         continue;
                     }
                     //get adjecent resistance from resistance map
-                    byte adjecentResistance = GridLayout.Inbuffer[adjecentY, adjecentX];
+                    byte adjecentResistance = GridLayout.Inbuffer[adjecentX, adjecentY];
                     //check traversability
                     if (adjecentResistance == 0)
                     {
@@ -208,7 +208,7 @@ namespace opfa_common_managed
                         continue;
                     }
                     //get adjecent resistance from resistance map
-                    byte adjecentResistance = GridLayout.Inbuffer[adjecentY, adjecentX];
+                    byte adjecentResistance = GridLayout.Inbuffer[adjecentX, adjecentY];
                     //check traversability
                     if (adjecentResistance == 0)
                     {
@@ -219,7 +219,7 @@ namespace opfa_common_managed
                     if (i > 3)
                     {
                         //add diagonal modifier for path smoothing
-                        adjecentResistance = (byte)(adjecentResistance * GridLayout.DiagonalModifier);
+                        adjecentResistance = (byte)(adjecentResistance * GridMemory.DiagonalModifier);
                     }
                     GridNode adjecent;
                     //if adjecent x,y doesn't exist
@@ -330,7 +330,7 @@ namespace opfa_common_managed
         #endregion
 
         #region Native Function Entrypoints    
-        [DllImport("opfa_common_native.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("opfa_common_native.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)]
         private static extern void Init(
         [param: MarshalAs(UnmanagedType.I4)]
             int index,
@@ -359,7 +359,7 @@ namespace opfa_common_managed
         [param: MarshalAs(UnmanagedType.U2)]
             ushort targetY);
 
-        [DllImport("opfa_common_native.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("opfa_common_native.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)]
         private static extern void Reinit(
             [param: MarshalAs(UnmanagedType.I4)]
                         int index,
@@ -378,14 +378,14 @@ namespace opfa_common_managed
             [param: MarshalAs(UnmanagedType.U2)]
                         ushort targetY);
 
-        [DllImport("opfa_common_native.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("opfa_common_native.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)]
         [return: MarshalAs(UnmanagedType.I4)]
         private static extern int ProduceFrame([param: MarshalAs(UnmanagedType.I4)] int index);
 
-        [DllImport("opfa_common_native.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("opfa_common_native.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)]
         private static extern void Free([param: MarshalAs(UnmanagedType.I4)] int index);
 
-        [DllImport("opfa_common_native.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("opfa_common_native.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)]
         private static extern void FreeBatch();
         #endregion
     }

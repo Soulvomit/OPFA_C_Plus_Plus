@@ -5,6 +5,10 @@ namespace opfa_common_console
 {
     public static class PathSpeedTest
     {
+        public static int Counter = 0;
+        public static ulong ManagedResults = 0;
+        public static ulong NativeResults = 0;
+
         #region Run Simple Tests
         public static void RunSimpleTest()
         {
@@ -291,78 +295,33 @@ namespace opfa_common_console
             Profile pManaged;
             Profile pNative;
 
-            //dummy run
-            Profiler.ProfileGrid(profile: out pManaged, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
-                                                gridSize: mapSize, outBufferSize: (uint)(mapSize * 2), startX: 0, startY: 0,
-                                                targetX: (ushort)(mapSize - 1), targetY: (ushort)(mapSize - 1));
             //result run
             Profiler.ProfileGrid(profile: out pManaged, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
                                                 gridSize: mapSize, outBufferSize: (uint)(mapSize * 2), startX: 0, startY: 0,
                                                 targetX: (ushort)(mapSize - 1), targetY: (ushort)(mapSize - 1));
 
-            //dummy run
-            Profiler.ProfileGrid(profile: out pNative, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
-                                                gridSize: mapSize, outBufferSize: (uint)(mapSize * 2), startX: 0, startY: 0,
-                                                targetX: (ushort)(mapSize - 1), targetY: (ushort)(mapSize - 1),
-                                                pathType: GridPathType.Normal, layout: null, enviromentType: EnviromentType.Native);
             //result run
             Profiler.ProfileGrid(profile: out pNative, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
                                                 gridSize: mapSize, outBufferSize: (uint)(mapSize * 2), startX: 0, startY: 0,
                                                 targetX: (ushort)(mapSize - 1), targetY: (ushort)(mapSize - 1),
                                                 pathType: GridPathType.Normal, layout: null, enviromentType: EnviromentType.Native);
 
-
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Map :             " + mapSize + "x" + mapSize);
-            Console.WriteLine("MapCreationTime : ~" + pManaged.MapCreationTime + "MS");
-            Console.WriteLine("StartPos :        " + "[0, 0]");
-            Console.WriteLine("TargetPos :       " + "[" + (mapSize - 1).ToString() + ", " + (mapSize - 1).ToString() +"]");
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("Enviroment :      " + "Managed");
-            Console.WriteLine("PathLength :      " + pManaged.PathLength);
-            if (pManaged.PathRunTime > failTimeMillis)
-                Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("PathRuntime :     " + pManaged.PathRunTimeTicks + " Ticks");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Enviroment :      " + "Native");
-            Console.WriteLine("PathLength :      " + pNative.PathLength);
-            if (pNative.PathRunTime > failTimeMillis)
-                Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("PathRuntime :     " + pNative.PathRunTimeTicks + " Ticks");
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            if (pManaged.PathRunTimeTicks > pNative.PathRunTimeTicks)
-            {
-                Console.WriteLine("Winner :          Native");
-            }
-            else if (pManaged.PathRunTimeTicks < pNative.PathRunTimeTicks)
-            {
-                Console.WriteLine("Winner :          Managed");
-            }
-            else
-            {
-                Console.WriteLine("Winner :          Inconclusive");
-            }
-            Console.WriteLine();
+            Print(mapSize, failTimeMillis, pManaged, pNative, (ushort)(mapSize - 1), (ushort)(mapSize - 1));
+            Counter += 1;
+            ManagedResults += (ulong)pManaged.PathRunTimeTicks;
+            NativeResults += (ulong)pNative.PathRunTimeTicks;
         }
+
         private static void TestSpeedSimple(ushort mapSize, int failTimeMillis, ushort targetX, ushort targetY)
         {
             Profile pManaged;
             Profile pNative;
 
-            //dummy run
-            Profiler.ProfileGrid(profile: out pManaged, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
-                                                gridSize: mapSize, outBufferSize: (uint)(mapSize * 2), startX: 0, startY: 0,
-                                                targetX: targetX, targetY: targetY);
             //result run
             Profiler.ProfileGrid(profile: out pManaged, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
                                                 gridSize: mapSize, outBufferSize: (uint)(mapSize * 2), startX: 0, startY: 0,
                                                 targetX: targetX, targetY: targetY);
 
-            //dummy run
-            Profiler.ProfileGrid(profile: out pNative, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
-                                                gridSize: mapSize, outBufferSize: (uint)(mapSize * 2), startX: 0, startY: 0,
-                                                targetX: targetX, targetY: targetY, pathType: GridPathType.Normal, layout: null,
-                                                enviromentType: EnviromentType.Native);
             //result run
             Profiler.ProfileGrid(profile: out pNative, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
                                                 gridSize: mapSize, outBufferSize: (uint)(mapSize * 2), startX: 0, startY: 0,
@@ -370,37 +329,10 @@ namespace opfa_common_console
                                                 enviromentType: EnviromentType.Native);
 
 
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Map :             " + mapSize + "x" + mapSize);
-            Console.WriteLine("MapCreationTime : ~" + pManaged.MapCreationTime + "MS");
-            Console.WriteLine("StartPos :        " + "[0, 0]");
-            Console.WriteLine("TargetPos :       " + "[" + targetX + ", " + targetY + "]");
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("Enviroment :      " + "Managed");
-            Console.WriteLine("PathLength :      " + pManaged.PathLength);
-            if (pManaged.PathRunTime > failTimeMillis)
-                Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("PathRuntime :     " + pManaged.PathRunTimeTicks + " Ticks");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Enviroment :      " + "Native");
-            Console.WriteLine("PathLength :      " + pNative.PathLength);
-            if (pNative.PathRunTime > failTimeMillis)
-                Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("PathRuntime :     " + pNative.PathRunTimeTicks + " Ticks");
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            if (pManaged.PathRunTimeTicks > pNative.PathRunTimeTicks)
-            {
-                Console.WriteLine("Winner :          Native");
-            }
-            else if (pManaged.PathRunTimeTicks < pNative.PathRunTimeTicks)
-            {
-                Console.WriteLine("Winner :          Managed");
-            }
-            else
-            {
-                Console.WriteLine("Winner :          Inconclusive");
-            }
-            Console.WriteLine();
+            Print(mapSize, failTimeMillis, pManaged, pNative, targetX, targetY);
+            Counter += 1;
+            ManagedResults += (ulong)pManaged.PathRunTimeTicks;
+            NativeResults += (ulong)pNative.PathRunTimeTicks;
         }
         #endregion
 
@@ -410,20 +342,11 @@ namespace opfa_common_console
             Profile pManaged;
             Profile pNative;
 
-            //dummy run
-            Profiler.ProfileGrid(profile: out pManaged, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
-                                                gridSize: mapSize, outBufferSize: (uint)(mapSize * 2), startX: 0, startY: 0,
-                                                targetX: (ushort)(mapSize - 1), targetY: (ushort)(mapSize - 1));
             //result run
             Profiler.ProfileGrid(profile: out pManaged, onThread: false, random: true, blockFrequency: blockFrequency, resistanceCap: 127,
                                                 gridSize: mapSize, outBufferSize: (uint)(mapSize * 2), startX: 0, startY: 0,
                                                 targetX: (ushort)(mapSize - 1), targetY: (ushort)(mapSize - 1));
 
-            //dummy run
-            Profiler.ProfileGrid(profile: out pNative, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
-                                                gridSize: mapSize, outBufferSize: (uint)(mapSize * 2), startX: 0, startY: 0,
-                                                targetX: (ushort)(mapSize - 1), targetY: (ushort)(mapSize - 1),
-                                                pathType: GridPathType.Normal, layout: null, enviromentType: EnviromentType.Native);
             //result run
             Profiler.ProfileGrid(profile: out pNative, onThread: false, random: true, blockFrequency: blockFrequency, resistanceCap: 127,
                                                 gridSize: mapSize, outBufferSize: (uint)(mapSize * 2), startX: 0, startY: 0,
@@ -431,57 +354,21 @@ namespace opfa_common_console
                                                 pathType: GridPathType.Normal, layout: null, enviromentType: EnviromentType.Native);
 
 
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Map :             " + mapSize + "x" + mapSize);
-            Console.WriteLine("MapCreationTime : ~" + pManaged.MapCreationTime + "MS");
-            Console.WriteLine("StartPos :        " + "[0, 0]");
-            Console.WriteLine("TargetPos :       " + "[" + (mapSize - 1).ToString() + ", " + (mapSize - 1).ToString() + "]");
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("Enviroment :      " + "Managed");
-            Console.WriteLine("PathLength :      " + pManaged.PathLength);
-            if (pManaged.PathRunTime > failTimeMillis)
-                Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("PathRuntime :     " + pManaged.PathRunTimeTicks + " Ticks");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Enviroment :      " + "Native");
-            Console.WriteLine("PathLength :      " + pNative.PathLength);
-            if (pNative.PathRunTime > failTimeMillis)
-                Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("PathRuntime :     " + pNative.PathRunTimeTicks + " Ticks");
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            if (pManaged.PathRunTimeTicks > pNative.PathRunTimeTicks)
-            {
-                Console.WriteLine("Winner :          Native");
-            }
-            else if (pManaged.PathRunTimeTicks < pNative.PathRunTimeTicks)
-            {
-                Console.WriteLine("Winner :          Managed");
-            }
-            else
-            {
-                Console.WriteLine("Winner :          Inconclusive");
-            }
-            Console.WriteLine();
+            Print(mapSize, failTimeMillis, pManaged, pNative, (ushort)(mapSize - 1), (ushort)(mapSize - 1));
+            Counter += 1;
+            ManagedResults += (ulong)pManaged.PathRunTimeTicks;
+            NativeResults += (ulong)pNative.PathRunTimeTicks;
         }
         private static void TestSpeedRandom(ushort mapSize, int failTimeMillis, ushort targetX, ushort targetY, byte blockFrequency)
         {
             Profile pManaged;
             Profile pNative;
 
-            //dummy run
-            Profiler.ProfileGrid(profile: out pManaged, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
-                                                gridSize: mapSize, outBufferSize: (uint)(mapSize * 2), startX: 0, startY: 0,
-                                                targetX: targetX, targetY: targetY);
             //result run
             Profiler.ProfileGrid(profile: out pManaged, onThread: false, random: true, blockFrequency: blockFrequency, resistanceCap: 127,
                                                 gridSize: mapSize, outBufferSize: (uint)(mapSize * 2), startX: 0, startY: 0,
                                                 targetX: targetX, targetY: targetY);
 
-            //dummy run
-            Profiler.ProfileGrid(profile: out pNative, onThread: false, random: false, blockFrequency: 255, resistanceCap: 255,
-                                                gridSize: mapSize, outBufferSize: (uint)(mapSize * 2), startX: 0, startY: 0,
-                                                targetX: targetX, targetY: targetY, pathType: GridPathType.Normal, layout: null,
-                                                enviromentType: EnviromentType.Native);
             //result run
             Profiler.ProfileGrid(profile: out pNative, onThread: false, random: true, blockFrequency: blockFrequency, resistanceCap: 127,
                                                 gridSize: mapSize, outBufferSize: (uint)(mapSize * 2), startX: 0, startY: 0,
@@ -489,6 +376,16 @@ namespace opfa_common_console
                                                 enviromentType: EnviromentType.Native);
 
 
+            Print(mapSize, failTimeMillis, pManaged, pNative, targetX, targetY);
+            Counter += 1;
+            ManagedResults += (ulong)pManaged.PathRunTimeTicks;
+            NativeResults += (ulong)pNative.PathRunTimeTicks;
+        }
+        #endregion
+
+        #region Print
+        private static void Print(ushort mapSize, int failTimeMillis, Profile pManaged, Profile pNative, ushort targetX, ushort targetY)
+        {
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Map :             " + mapSize + "x" + mapSize);
             Console.WriteLine("MapCreationTime : ~" + pManaged.MapCreationTime + "MS");
@@ -509,11 +406,11 @@ namespace opfa_common_console
             Console.ForegroundColor = ConsoleColor.Magenta;
             if (pManaged.PathRunTimeTicks > pNative.PathRunTimeTicks)
             {
-                Console.WriteLine("Winner :          Native");
+                Console.WriteLine("Winner :          Native by " + (float)pManaged.PathRunTimeTicks / pNative.PathRunTimeTicks);
             }
             else if (pManaged.PathRunTimeTicks < pNative.PathRunTimeTicks)
             {
-                Console.WriteLine("Winner :          Managed");
+                Console.WriteLine("Winner :          Managed by " + (float)pNative.PathRunTimeTicks / pManaged.PathRunTimeTicks);
             }
             else
             {
