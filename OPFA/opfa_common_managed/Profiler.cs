@@ -12,7 +12,7 @@ namespace opfa_common_managed
             EnviromentType enviromentType = EnviromentType.Managed)
         {
             //init and setup grid layout (MAX SIZE: 46340x46340)
-            GridLayout gl = new GridLayout(gridSize, gridSize, pathType, 1.4f, 64);
+            GridLayout gl = new GridLayout(gridSize, gridSize, 64);
             //profile grid creation
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -37,6 +37,8 @@ namespace opfa_common_managed
             gm.EnviromentType = enviromentType;
             gm.StartPosition = new ushort[2] { startX, startY };
             gm.TargetPosition = new ushort[2] { targetX, targetY };
+            gm.GridPathType = pathType;
+            gm.DiagonalModifier = 1.4f;
             gl.Inbuffer[gm.StartPosition[0], gm.StartPosition[1]] = 1;
             gl.Inbuffer[gm.TargetPosition[0], gm.TargetPosition[1]] = 1;
             //profile grid path
@@ -137,10 +139,11 @@ namespace opfa_common_managed
         #endregion
 
         #region ProfileGridRun
-        public static void ProfileGridRun(byte blockFrequency, byte resistanceCap, bool random = true)
+        public static void ProfileGridRun(byte blockFrequency, byte resistanceCap, bool random = true, 
+            GridPathType pathType = GridPathType.Normal, EnviromentType enviroment = EnviromentType.Managed)
         {
             //init grid and memory pathfinder
-            GridLayout gl = new GridLayout(40, 40, GridPathType.Normal);
+            GridLayout gl = new GridLayout(40, 20);
             if (random)
             {
                 gl.GenerateRandomLayout(blockFrequency, resistanceCap);
@@ -151,7 +154,11 @@ namespace opfa_common_managed
             }
             GridMemory gm = new GridMemory(1600, gl);
             gm.StartPosition = new ushort[2] { 0, 0 };
-            gm.TargetPosition = new ushort[2] { 39, 39 };
+            gm.TargetPosition = new ushort[2] { 39, 19 };
+            gm.GridPathType = GridPathType.Normal;
+            gm.EnviromentType = enviroment;
+            gm.GridPathType = pathType;
+            gm.DiagonalModifier = 1.4f;
             gl.Inbuffer[gm.StartPosition[0], gm.StartPosition[1]] = 1;
             gl.Inbuffer[gm.TargetPosition[0], gm.TargetPosition[1]] = 1;
             //run memory pathfinder
@@ -182,8 +189,6 @@ namespace opfa_common_managed
                     ushort y = 0;
                     UInt16.TryParse(s[2], out y);
                     gm.StartPosition = new ushort[] { x, y };
-                    DrawGrid(null, gm, gl);
-                    Console.BackgroundColor = ConsoleColor.Black;
                 }
                 else if (cmd.StartsWith("-tpos"))
                 {
@@ -193,8 +198,6 @@ namespace opfa_common_managed
                     ushort y = 0;
                     UInt16.TryParse(s[2], out y);
                     gm.TargetPosition = new ushort[] { x, y };
-                    DrawGrid(null, gm, gl);
-                    Console.BackgroundColor = ConsoleColor.Black;
                 }
                 else if (cmd == "-t" || cmd == "-path")
                 {
@@ -203,6 +206,11 @@ namespace opfa_common_managed
                     for (int i = 0; i < gm.PathLength; i++)
                     {
                         Console.Write("{" + path[i, 0] + "," + path[i, 1] + "} ");
+                    }
+                    Console.WriteLine("Resistances: " + gm.PathLength);
+                    for (int i = 0; i < gm.PathLength; i++)
+                    {
+                        Console.Write("{" + gl.GetResistance((ushort)path[i, 0], (ushort)path[i, 1]) + "} ");
                     }
                     Console.WriteLine();
                     Console.WriteLine();

@@ -51,7 +51,8 @@ private:
 	uint8_t m_offset_count;
 	//data structures - on stack
 	std::unordered_map<uint32_t, GridNode> creation_map;
-	boost::heap::fibonacci_heap<std::pair<uint32_t, node_packet*>, boost::heap::compare<functor_fh>> open_queue;
+	std::priority_queue<std::pair<uint32_t, node_packet*>, std::vector<std::pair<uint32_t, node_packet*>>, functor_fh> open_queue;
+	//boost::heap::fibonacci_heap<std::pair<uint32_t, node_packet*>, boost::heap::compare<functor_fh>> open_queue;
 	std::unordered_set<uint32_t> closed_set;
 	//state indicators
 	std::atomic<bool> producing_frame = false;

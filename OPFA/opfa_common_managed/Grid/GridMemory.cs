@@ -8,6 +8,8 @@
         internal volatile ushort targetX = 0;
         internal volatile ushort targetY = 0;
         internal volatile uint[] outbuffer;
+        internal volatile GridPathType pathType = GridPathType.Normal;
+        internal volatile float diagonalModifier = 1.4f;
 
         #region Properties
         public GridLayout GridLayout { get { return (layout as GridLayout); } }
@@ -49,6 +51,8 @@
                 return temp;
             }
         }
+        public GridPathType GridPathType { get { return pathType; } set { pathType = value; } }
+        public float DiagonalModifier { get { return diagonalModifier; } set { diagonalModifier = value; } }
         #endregion
 
         #region Constructor

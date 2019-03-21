@@ -170,7 +170,7 @@ int32_t GridPathfinder::produce_frame_normal()
 				continue;
 			}
 			//get adjecent resistance from resistance map
-			uint8_t adjecent_resistance = p_inbuffer[adjecent_x + adjecent_y * m_width]; //potential fix
+			uint8_t adjecent_resistance = p_inbuffer[adjecent_y + adjecent_x * m_height]; //potential fix
 			//check traversability
 			if (adjecent_resistance == 0)
 			{
@@ -262,7 +262,7 @@ int32_t GridPathfinder::produce_frame_diagonal_weighted()
 				continue;
 			}
 			//get adjecent resistance from resistance map
-			uint8_t adjecent_resistance = p_inbuffer[adjecent_x + adjecent_y * m_width]; //potential fix
+			uint8_t adjecent_resistance = p_inbuffer[adjecent_y + adjecent_x * m_height]; //potential fix
 			//check traversability
 			if (adjecent_resistance == 0)
 			{

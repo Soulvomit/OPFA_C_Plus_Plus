@@ -11,26 +11,20 @@ namespace opfa_common_managed
         //private members
         private ushort width;
         private ushort height;
-        private GridPathType pathType;
-        private float diagonalModifier;
         //public members
         public volatile byte[,] Inbuffer = null;
 
         #region Properties
         public ushort Width { get { return width; } }
         public ushort Height { get { return height; } }
-        public GridPathType GridPathType { get { return pathType; } set { pathType = value; } }
-        public float DiagonalModifier { get { return diagonalModifier; } }
         public uint InBufferSize { get { return (uint)(width * height); } }
         #endregion
 
         #region Constructor
-        public GridLayout(ushort width, ushort height, GridPathType pathType, float diagonalModifier = 1.4f, byte baseCost = 127) : base(baseCost)
+        public GridLayout(ushort width, ushort height, byte baseCost = 127) : base(baseCost)
         {
             this.width = width;
             this.height = height;
-            this.pathType = pathType;
-            this.diagonalModifier = diagonalModifier;
         }
         #endregion
 
