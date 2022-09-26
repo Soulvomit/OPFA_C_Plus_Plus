@@ -9,7 +9,7 @@ struct node_packet
 	uint32_t m_g_cost = 0xFF'FF'FF'FF;
 	uint32_t m_h_cost = 0xFF'FF'FF'FF;
 	uint32_t m_parent_fxy = 0;
-	uint16_t xy[2];
+	uint16_t xy[2] = {0, 0};
 };
 #pragma pack(pop)
 #pragma endregion
